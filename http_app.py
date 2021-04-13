@@ -303,7 +303,7 @@ def delete_sub_all(count):
     if len(conf.conf['sub']) == 0:
         return 2001, count
     else:
-        if conf.conf['sub'].index(count):
+        if len(conf.conf['sub']) >= count:
             target = conf.conf['sub'][count]['parent'] + '/' + conf.conf['sub'][count]['name']
             rsc, res_body, count = http_adn.delsub(target, count)
             if rsc == 5106 or rsc == 2002 or rsc == 2000 or rsc == 4105 or rsc == 4004:
@@ -320,7 +320,7 @@ def create_sub_all(count):
     if len(conf.conf['sub']) == 0:
         return 2001, count
     else:
-        if conf.conf['sub'].get(count):
+        if len(conf.conf['sub']) >= count:
             parent = conf.conf['sub'][count]['parent']
             rn = conf.conf['sub'][count]['name']
             nu = conf.conf['sub'][count]['nu']
