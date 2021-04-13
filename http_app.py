@@ -320,7 +320,7 @@ def create_sub_all(count):
     if len(conf.conf['sub']) == 0:
         return 2001, count
     else:
-        if len(conf.conf['sub']) >= count:
+        if len(conf.conf['sub']) > count:
             parent = conf.conf['sub'][count]['parent']
             rn = conf.conf['sub'][count]['name']
             nu = conf.conf['sub'][count]['nu']
