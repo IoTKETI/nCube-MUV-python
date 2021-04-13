@@ -450,7 +450,7 @@ def retrieve_my_cnt_name():
                                 info = {}
                                 info['parent'] = '/Mobius/' + drone_info["gcs"] + '/Mission_Data/' + drone_info[
                                     "drone"] + '/' + mission_name + '/' + sub_container_name
-                                info['name'] = sub_container_name
+                                info['name'] = 'sub_msw'
                                 info['nu'] = 'mqtt://' + conf.conf["cse"]["host"] + '/' + conf.conf['ae'][
                                     'id'] + '?ct=json'
                                 conf.conf['cnt'].append(info)
