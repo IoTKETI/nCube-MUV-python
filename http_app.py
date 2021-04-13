@@ -431,7 +431,7 @@ def retrieve_my_cnt_name():
                                     info['parent'] = '/Mobius/' + drone_info["gcs"] + '/Mission_Data/' + drone_info[
                                         "drone"] + '/' + mission_name + '/' + container_name
                                     info['name'] = 'sub_msw'
-                                    info['nu'] = 'mqtt://' + drone_info["gcs"]["host"] + '/' + \
+                                    info['nu'] = 'mqtt://' + conf.conf["cse"]["host"] + '/' + \
                                                  drone_info['mission'][mission_name][chk_cnt][i].split(':')[
                                                      1] + '?ct=json'
                                     conf.conf['cnt'].append(info)
@@ -451,7 +451,7 @@ def retrieve_my_cnt_name():
                                 info['parent'] = '/Mobius/' + drone_info["gcs"] + '/Mission_Data/' + drone_info[
                                     "drone"] + '/' + mission_name + '/' + sub_container_name
                                 info['name'] = sub_container_name
-                                info['nu'] = 'mqtt://' + drone_info["gcs"]["host"] + '/' + conf.conf['ae'][
+                                info['nu'] = 'mqtt://' + conf.conf["cse"]["host"] + '/' + conf.conf['ae'][
                                     'id'] + '?ct=json'
                                 conf.conf['cnt'].append(info)
 
