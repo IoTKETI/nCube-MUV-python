@@ -383,7 +383,6 @@ def retrieve_my_cnt_name():
         info['parent'] = '/Mobius/' + drone_info["gcs"] + '/Drone_Data/' + drone_info["drone"]
         info['name'] = my_sortie_name
         conf.conf['cnt'].append(info)
-        print('\r\n' + str(conf.conf['cnt']) + '\r\n')
 
         my_parent_cnt_name = info['parent']
         my_cnt_name = my_parent_cnt_name + '/' + info['name']
