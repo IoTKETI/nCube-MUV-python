@@ -453,7 +453,7 @@ def retrieve_my_cnt_name():
                                 info['name'] = 'sub_msw'
                                 info['nu'] = 'mqtt://' + conf.conf["cse"]["host"] + '/' + conf.conf['ae'][
                                     'id'] + '?ct=json'
-                                conf.conf['cnt'].append(info)
+                                conf.conf['sub'].append(info)
 
                     chk_cnt = 'fc_container'
                     if drone_info['mission'][mission_name].get(chk_cnt):
