@@ -89,6 +89,7 @@ def control_web(driver):
     rsc, res_body = crt_room(session_id, handle_id, room_number)
 
     driver.implicitly_wait(5)
+    time.sleep(2)
 
     Room_Number = driver.find_element_by_id('roomnumber')
     Room_Number.send_keys(room_number)
