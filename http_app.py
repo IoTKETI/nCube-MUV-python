@@ -713,13 +713,13 @@ def muv_mqtt_connect(broker_ip, port):
             print('muv_mqtt_client connected to {}'.format(broker_ip))
 
         else:
-            thyme.mqtt_client = mqtt.Client(clean_session=True)
-            thyme.mqtt_client.on_connect = muv_on_connect
-            thyme.mqtt_client.on_subscribe = muv_on_subscribe
-            thyme.mqtt_client.on_message = muv_on_message
-            thyme.mqtt_client.tls_set(certfile='./server-crt.pem', keyfile='./server-key.pem')
+            thyme.muv_mqtt_client = mqtt.Client(clean_session=True)
+            thyme.muv_mqtt_client.on_connect = muv_on_connect
+            thyme.muv_mqtt_client.on_subscribe = muv_on_subscribe
+            thyme.muv_mqtt_client.on_message = muv_on_message
+            thyme.muv_mqtt_client.tls_set(certfile='./server-crt.pem', keyfile='./server-key.pem')
             thyme.muv_mqtt_client.connect(broker_ip, port, keepalive=10)
-            thyme.mqtt_client.loop_start()
+            thyme.muv_mqtt_client.loop_start()
             print('muv_mqtt_client connected to {}'.format(broker_ip))
 
 
