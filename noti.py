@@ -33,8 +33,8 @@ def parse_sgn(rqi, pc):
             if sgnObj.get('nev') is not None:
                 if sgnObj['nev'].get('rep') is not None:
                     if sgnObj['nev']['rep'].get('m2m:cin') is not None:
-                        sgnObj['nev']['rep']['cin'] = sgnObj['nef']['rep']['m2m:cin']
-                        del sgnObj['nef']['rep']['m2m:cin']
+                        sgnObj['nev']['rep']['cin'] = sgnObj['nev']['rep']['m2m:cin']
+                        del sgnObj['nev']['rep']['m2m:cin']
 
                     if sgnObj['nev']['rep'].get('cin') is not None:
                         cinObj = sgnObj['nev']['rep']['cin']
@@ -77,7 +77,7 @@ def response_mqtt(rsp_topic, rsc, to, fr, rqi, inpc, bodytype):
     elif bodytype == 'cbor':
         pass
     else:  # json
-        thyme.mqtt_client.publish(rsp_topic, json.loads(rsp_message['m2m:rsp']))
+        thyme.mqtt_client.publish(rsp_topic, json.dumps(rsp_message['m2m:rsp']))
 
 
 def mqtt_noti_action(topic_arr, jsonObj):
@@ -118,17 +118,17 @@ def mqtt_noti_action(topic_arr, jsonObj):
             resp_topic = '/oneM2M/resp/' + topic_arr[3] + '/' + topic_arr[4] + '/' + topic_arr[5]
             response_mqtt(resp_topic, 2001, '', conf.conf["ae"]["id"], rqi, '', topic_arr[5])
 
-            if (cinObj["sud"] or cinObj["vrq"]):
+            if (cinObj.get("sud") or cinObj.get("vrq")):
                 pass
             else:
                 print('mqtt ' + bodytype + ' notification <----')
                 print('mqtt response - 2001 ---->')
 
                 if http_app.getType(cinObj["con"] == 'string'):
-                    thyme.muv_mqtt_client.publish(path_arr.join('/').replace('/' + path_arr[len(path_arr) - 1], ''),
+                    thyme.muv_mqtt_client.publish('/'.join(path_arr).replace('/' + path_arr[len(path_arr) - 1], ''),
                                                   cinObj["con"])
                 else:
-                    thyme.muv_mqtt_client.publish(path_arr.join('/').replace('/' + path_arr[len(path_arr) - 1], ''),
+                    thyme.muv_mqtt_client.publish('/'.join(path_arr).replace('/' + path_arr[len(path_arr) - 1], ''),
                                                   json.dumps(cinObj["con"]))
         else:
             print('[mqtt_noti_action] message is not noti')

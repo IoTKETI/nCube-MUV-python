@@ -116,12 +116,12 @@ def getType(p):
 # ready for mqtt
 for i in range(0, len(conf.conf['sub'])):
     if conf.conf['sub'][i]['name'] is not None:
-        if urlparse(conf.conf['sub'][i]['nu']).scheme == 'http:':
+        if urlparse(conf.conf['sub'][i]['nu']).scheme == 'http':
             HTTP_SUBSCRIPTION_ENABLE = 1
             if urlparse(conf.conf['sub'][i]['nu']).netloc == 'autoset':
                 conf.conf.sub[i]['nu'] = 'http://' + socket.gethostbyname(socket.gethostname()) + ':' + conf.conf['ae'][
                     'port'] + urlparse(conf.conf['sub'][i]['nu'])['pathname']
-        elif urlparse(conf.conf['sub'][i]['nu']).scheme == 'mqtt:':
+        elif urlparse(conf.conf['sub'][i]['nu']).scheme == 'mqtt':
             MQTT_SUBSCRIPTION_ENABLE = 1
         else:
             print('notification uri of subscription is not supported')
@@ -132,7 +132,6 @@ request_count = 0
 
 def ready_for_notification():
     global noti_topic
-
     if HTTP_SUBSCRIPTION_ENABLE == 1:
         server = HTTPServer(('0.0.0.0', int(conf.conf['ae']['port'])), BaseHTTPRequestHandler)
         print('http_server running at {} port'.format(conf.conf['ae']['port']))
@@ -141,7 +140,8 @@ def ready_for_notification():
     if MQTT_SUBSCRIPTION_ENABLE == 1:
         for i in range(0, len(conf.conf['sub'])):
             if conf.conf['sub'][i]['name'] is not None:
-                if urlparse(conf.conf['sub'][i]['nu']).scheme == 'mqtt:':
+                print(urlparse(conf.conf['sub'][i]['nu']).scheme, '==============================')
+                if urlparse(conf.conf['sub'][i]['nu']).scheme == 'mqtt':
                     if urlparse(conf.conf['sub'][i]['nu']).netloc == 'autoset':
                         conf.conf['sub'][i]['nu'] = 'mqtt://' + conf.conf['cse']["host"] + '/' + conf.conf['ae']['id']
                         noti_topic = '/oneM2M/req/+/{}/#'.format(conf.conf['ae']['id'])
@@ -149,6 +149,7 @@ def ready_for_notification():
                         noti_topic = '/oneM2M/req/+/{}/#'.format(conf.conf['ae']['id'])
                     else:
                         noti_topic = '{}'.format(urlparse(conf.conf['sub'][i]['nu']).path)
+                        
 
         mqtt_connect(conf.conf['cse']["host"])
 
@@ -434,7 +435,7 @@ def retrieve_my_cnt_name():
                                     info['nu'] = 'mqtt://' + conf.conf["cse"]["host"] + '/' + \
                                                  drone_info['mission'][mission_name][chk_cnt][i].split(':')[
                                                      1] + '?ct=json'
-                                    conf.conf['cnt'].append(info)
+                                    conf.conf['sub'].append(info)
 
                     chk_cnt = 'sub_container'
                     if drone_info['mission'][mission_name].get(chk_cnt):
@@ -611,7 +612,6 @@ def http_watchdog():
 def fc_on_connect(client, userdata, flags, rc):
     global muv_sub_gcs_topic
     global noti_topic
-    global muv_sub_msw_topic
 
     if muv_sub_gcs_topic != '':
         thyme.mqtt_client.subscribe(muv_sub_gcs_topic, 0)
@@ -630,16 +630,15 @@ def fc_on_message(client, userdata, msg):
     global muv_sub_gcs_topic
     global noti_topic
 
-    message = tas_mav.Hex(msg.payload)
-
     if msg.topic == muv_sub_gcs_topic:
+        message = tas_mav.Hex(msg.payload)
         tas_mav.gcs_noti_handler(bytearray.fromhex(" ".join(message[i:i + 2] for i in range(0, len(message), 2))))
 
     else:
-        if msg.topic.contains('/oneM2M/req/'):
-            jsonObj = json.loads(message)
+        if '/oneM2M/req/' in msg.topic:
+            jsonObj = json.loads(msg.payload)
 
-            if jsonObj['m2m:rqp'] is None:
+            if not(jsonObj.get('m2m:rqp')):
                 jsonObj['m2m:rqp'] = jsonObj
 
             noti.mqtt_noti_action(msg.topic.split('/'), jsonObj)
