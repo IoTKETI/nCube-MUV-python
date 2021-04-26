@@ -149,7 +149,6 @@ def ready_for_notification():
                         noti_topic = '/oneM2M/req/+/{}/#'.format(conf.conf['ae']['id'])
                     else:
                         noti_topic = '{}'.format(urlparse(conf.conf['sub'][i]['nu']).path)
-                        
 
         mqtt_connect(conf.conf['cse']["host"])
 
@@ -235,11 +234,11 @@ def fork_msw(mission_name, directory_name):
     try:
         executable_name = directory_name + '/' + mission_name + '.js'
         dir_name = directory_name
-        drone_info_gcs = drone_info["gcs"]
-        drone_info_drone = drone_info["drone"]
+        # drone_info_gcs = drone_info["gcs"]
+        # drone_info_drone = drone_info["drone"]
 
         nodeMsw = subprocess.Popen(
-            ['node', executable_name, my_sortie_name, dir_name, drone_info_gcs, drone_info_drone],
+            ['node', executable_name, my_sortie_name, dir_name, json.dumps(drone_info)],
             stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
 
         (stdout, stderr) = nodeMsw.communicate()
@@ -600,8 +599,6 @@ def http_watchdog():
                 ready_for_notification()
 
                 tas_mav.tas_ready()
-                if drone_info["webrtc"] == "enable":
-                    webrtc.webrtc()
 
                 http_watchdog()
     elif thyme.sh_state == 'crtci':
@@ -638,7 +635,7 @@ def fc_on_message(client, userdata, msg):
         if '/oneM2M/req/' in msg.topic:
             jsonObj = json.loads(msg.payload)
 
-            if not(jsonObj.get('m2m:rqp')):
+            if not (jsonObj.get('m2m:rqp')):
                 jsonObj['m2m:rqp'] = jsonObj
 
             noti.mqtt_noti_action(msg.topic.split('/'), jsonObj)
