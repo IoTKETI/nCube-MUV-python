@@ -234,11 +234,11 @@ def fork_msw(mission_name, directory_name):
     try:
         executable_name = directory_name + '/' + mission_name + '.js'
         dir_name = directory_name
-        # drone_info_gcs = drone_info["gcs"]
-        # drone_info_drone = drone_info["drone"]
+        drone_info_gcs = drone_info["gcs"]
+        drone_info_drone = drone_info["drone"]
 
         nodeMsw = subprocess.Popen(
-            ['node', executable_name, my_sortie_name, dir_name, json.dumps(drone_info)],
+            ['node', executable_name, my_sortie_name, dir_name, drone_info_gcs, drone_info_drone],
             stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
 
         (stdout, stderr) = nodeMsw.communicate()
