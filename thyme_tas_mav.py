@@ -77,7 +77,7 @@ def tas_ready():
                 # _server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 # print('socket connected')
         elif http_app.my_drone_type == 'pixhawk':
-            mavPortNum = '/dev/ttyAMA0'
+            mavPortNum = 'COM6'
             mavBaudrate = '57600'
             mavPortOpening()
     except Exception as e:
@@ -450,14 +450,10 @@ def mavPortData(mavPort):
     while True:
         data = mavPort.readline()
 
-        if mavStrFromDroneLength > 0:
-            mavStrFromDrone = mavStrFromDrone[mavStrFromDroneLength:]
-            mavStrFromDroneLength = 0
-
-        mavStrFromDrone += Hex(data)
+        mavStrFromDrone = Hex(data)
 
         while len(mavStrFromDrone) > 12:
-            stx = mavStrFromDrone[0:2]
+            stx = mavStrFromDrone[mavStrFromDroneLength:mavStrFromDroneLength + 2]
             if stx == 'fe':
                 if stx == 'fe':
                     length = int(mavStrFromDrone[mavStrFromDroneLength + 2:mavStrFromDroneLength + 4], 16)
@@ -478,9 +474,8 @@ def mavPortData(mavPort):
                     break
             else:
                 mavStrFromDrone = mavStrFromDrone[2:]
-                # print('else-mavStrFromDrone: ', mavStrFromDrone)
 
-        continue
+        mavStrFromDroneLength = 0
 
 
 fc = {}
@@ -654,7 +649,8 @@ def parseMavFromDrone(mavPacket):
                 http_app.my_cnt_name = http_app.my_parent_cnt_name + '/' + http_app.my_sortie_name
 
     except Exception as e:
-        print(e)
+        print('parseMavFromDrone: ', e)
+        # print('parseMavFromDrone: ', mavPacket, 'error: ', e)
 
 
 end_arm_time = 0
