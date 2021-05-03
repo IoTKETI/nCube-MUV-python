@@ -77,7 +77,7 @@ def tas_ready():
                 # _server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 # print('socket connected')
         elif http_app.my_drone_type == 'pixhawk':
-            mavPortNum = 'COM6'
+            mavPortNum = '/dev/ttyAMA0'
             mavBaudrate = '57600'
             mavPortOpening()
     except Exception as e:
