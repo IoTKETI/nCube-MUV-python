@@ -17,7 +17,6 @@ import conf
 import noti
 import thyme_tas_mav as tas_mav
 import http_adn
-import webrtc
 
 HTTP_SUBSCRIPTION_ENABLE = 0
 MQTT_SUBSCRIPTION_ENABLE = 0
@@ -55,7 +54,7 @@ muv_pub_fc_gpi_topic = ''
 muv_pub_fc_hb_topic = ''
 
 msw_package = ''
-
+webrtc_room_number = 0
 
 def delay(delay=0.):
     """
@@ -261,12 +260,18 @@ msw_directory = {}
 def requireMsw(mission_name, directory_name):
     global msw_package
     global msw_directory
+    global drone_info
+    global webrtc_room_number
 
     require_msw_name = directory_name.replace(mission_name + '_', '')
     msw_directory[require_msw_name] = directory_name
 
-    p = threading.Thread(target=fork_msw, args=(mission_name, directory_name,))
-    p.start()
+    if mission_name == 'msw_webrtc':
+        os.system('./' + directory_name + '/webrtc.sh ' + drone_info['host'] + ' ' + drone_info['drone'] + ' ' + webrtc_room_number)
+        print('./' + directory_name + '/webrtc.sh ' + drone_info['host'] + ' ' + drone_info['drone'] + ' ' + webrtc_room_number)
+    else:
+        p = threading.Thread(target=fork_msw, args=(mission_name, directory_name,))
+        p.start()
     # fork_msw(mission_name, directory_name)
 
 
@@ -352,6 +357,7 @@ def retrieve_my_cnt_name():
     global my_drone_type
     global my_cnt_name
     global my_parent_cnt_name
+    global webrtc_room_number
 
     res, res_body, count = http_adn.rtvct(
         '/Mobius/' + conf.conf['ae']['approval_gcs'] + '/approval/' + conf.conf['ae']['name'] + '/la', 0)
@@ -404,7 +410,10 @@ def retrieve_my_cnt_name():
                     info = {}
                     info['parent'] = '/Mobius/' + drone_info["gcs"] + '/Mission_Data/' + drone_info["drone"]
                     info['name'] = mission_name
-                    conf.conf['cnt'].append(info)
+                    if drone_info['mission'].get('msw_webrtc'):
+                        pass
+                    else:
+                        conf.conf['cnt'].append(info)
 
                     chk_cnt = 'container'
                     if drone_info['mission'][mission_name].get(chk_cnt):
@@ -415,16 +424,21 @@ def retrieve_my_cnt_name():
                                 info['parent'] = '/Mobius/' + drone_info["gcs"] + '/Mission_Data/' + drone_info[
                                     "drone"] + '/' + mission_name
                                 info['name'] = container_name
-                                conf.conf['cnt'].append(info)
+                                if drone_info['mission'].get('msw_webrtc'):
+                                    webrtc_room_number = container_name
+                                else:
+                                    conf.conf['cnt'].append(info)
 
                                 info = {}
                                 info['parent'] = '/Mobius/' + drone_info["gcs"] + '/Mission_Data/' + drone_info[
                                     "drone"] + '/' + mission_name + '/' + container_name
                                 info['name'] = my_sortie_name
-                                conf.conf['cnt'].append(info)
-                                mission_parent.append(info['parent'])
-
-                                muv_sub_msw_topic.append(info['parent'] + '/#')
+                                if drone_info['mission'].get('msw_webrtc'):
+                                    pass
+                                else:
+                                    conf.conf['cnt'].append(info)
+                                    mission_parent.append(info['parent'])
+                                    muv_sub_msw_topic.append(info['parent'] + '/#')
 
                                 if len(drone_info['mission'][mission_name][chk_cnt][i].split(':')) > 1:
                                     info = {}
@@ -434,7 +448,10 @@ def retrieve_my_cnt_name():
                                     info['nu'] = 'mqtt://' + conf.conf["cse"]["host"] + '/' + \
                                                  drone_info['mission'][mission_name][chk_cnt][i].split(':')[
                                                      1] + '?ct=json'
-                                    conf.conf['sub'].append(info)
+                                    if drone_info['mission'].get('msw_webrtc'):
+                                        pass
+                                    else:
+                                        conf.conf['sub'].append(info)
 
                     chk_cnt = 'sub_container'
                     if drone_info['mission'][mission_name].get(chk_cnt):
@@ -445,7 +462,10 @@ def retrieve_my_cnt_name():
                                 info['parent'] = '/Mobius/' + drone_info["gcs"] + '/Mission_Data/' + drone_info[
                                     "drone"] + '/' + mission_name
                                 info['name'] = sub_container_name
-                                conf.conf['cnt'].append(info)
+                                if drone_info['mission'].get('msw_webrtc'):
+                                    pass
+                                else:
+                                    conf.conf['cnt'].append(info)
 
                                 info = {}
                                 info['parent'] = '/Mobius/' + drone_info["gcs"] + '/Mission_Data/' + drone_info[
@@ -453,7 +473,10 @@ def retrieve_my_cnt_name():
                                 info['name'] = 'sub_msw'
                                 info['nu'] = 'mqtt://' + conf.conf["cse"]["host"] + '/' + conf.conf['ae'][
                                     'id'] + '?ct=json'
-                                conf.conf['sub'].append(info)
+                                if drone_info['mission'].get('msw_webrtc'):
+                                    pass
+                                else:
+                                    conf.conf['sub'].append(info)
 
                     chk_cnt = 'fc_container'
                     if drone_info['mission'][mission_name].get(chk_cnt):
@@ -464,7 +487,10 @@ def retrieve_my_cnt_name():
                                 info['parent'] = '/Mobius/' + drone_info["gcs"] + '/Mission_Data/' + drone_info[
                                     "drone"] + '/' + mission_name
                                 info['name'] = container_name
-                                conf.conf['fc'].append(info)
+                                if drone_info['mission'].get('msw_webrtc'):
+                                    pass
+                                else:
+                                    conf.conf['fc'].append(info)
 
                     chk_cnt = 'git'
                     if drone_info['mission'][mission_name].get(chk_cnt):
