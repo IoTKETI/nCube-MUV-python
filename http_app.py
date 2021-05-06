@@ -267,8 +267,7 @@ def requireMsw(mission_name, directory_name):
     msw_directory[require_msw_name] = directory_name
 
     if mission_name == 'msw_webrtc':
-        os.system('./' + directory_name + '/webrtc.sh ' + drone_info['host'] + ' ' + drone_info['drone'] + ' ' + webrtc_room_number)
-        print('./' + directory_name + '/webrtc.sh ' + drone_info['host'] + ' ' + drone_info['drone'] + ' ' + webrtc_room_number)
+        os.system('sh ./' + directory_name + '/webrtc.sh ' + drone_info['host'] + ' ' + drone_info['drone'] + ' ' + webrtc_room_number)
     else:
         p = threading.Thread(target=fork_msw, args=(mission_name, directory_name,))
         p.start()
