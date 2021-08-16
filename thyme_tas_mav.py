@@ -20,7 +20,7 @@ socket_mav = None
 mavPort = None
 
 mavPortNum = '/dev/ttyAMA0'
-mavBaudrate = '57600'
+mavBaudrate = '115200'
 
 mavstr = None
 
