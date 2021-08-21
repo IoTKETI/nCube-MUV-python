@@ -78,7 +78,7 @@ def tas_ready():
                 # print('socket connected')
         elif http_app.my_drone_type == 'pixhawk':
             mavPortNum = '/dev/ttyAMA0'
-            mavBaudrate = '57600'
+            mavBaudrate = '115200'
             mavPortOpening()
     except Exception as e:
         print(e)
@@ -449,33 +449,27 @@ def mavPortData(mavPort):
 
     while True:
         data = mavPort.readline()
-
-        mavStrFromDrone = Hex(data)
+        mavStrFromDrone += Hex(data)
 
         while len(mavStrFromDrone) > 12:
-            stx = mavStrFromDrone[mavStrFromDroneLength:mavStrFromDroneLength + 2]
+            stx = mavStrFromDrone[0:2]
             if stx == 'fe':
-                if stx == 'fe':
-                    length = int(mavStrFromDrone[mavStrFromDroneLength + 2:mavStrFromDroneLength + 4], 16)
-                    mavLength = (6 * 2) + (length * 2) + (2 * 2)
-                else:
-                    length = int(mavStrFromDrone[mavStrFromDroneLength + 2:mavStrFromDroneLength + 4], 16)
-                    mavLength = (10 * 2) + (length * 2) + (2 * 2)
+                length = int(mavStrFromDrone[mavStrFromDroneLength + 2:mavStrFromDroneLength + 4], 16)
+                mavLength = (6 * 2) + (length * 2) + (2 * 2)
 
-                if (len(mavStrFromDrone) - mavStrFromDroneLength) > mavLength:
+                if len(mavStrFromDrone) >= mavLength:
                     mavPacket = mavStrFromDrone[mavStrFromDroneLength:mavStrFromDroneLength + mavLength]
-                    mavStrFromDroneLength += mavLength
+                    mavStrFromDrone = mavStrFromDrone[mavStrFromDroneLength + mavLength:]
+                    mavStrFromDroneLength = 0
 
                     thyme.mqtt_client.publish(http_app.my_cnt_name, (
-                            bytearray.fromhex(" ".join(mavPacket[i:i + 2] for i in range(0, len(mavPacket), 2)))))
+                        bytearray.fromhex(" ".join(mavPacket[i:i + 2] for i in range(0, len(mavPacket), 2)))))
                     send_aggr_to_Mobius(http_app.my_cnt_name, mavPacket, 1.5)
                     parseMavFromDrone(mavPacket)
                 else:
                     break
             else:
                 mavStrFromDrone = mavStrFromDrone[2:]
-
-        mavStrFromDroneLength = 0
 
 
 fc = {}
